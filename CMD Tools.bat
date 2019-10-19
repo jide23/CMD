@@ -36,7 +36,7 @@ if '%errorlevel%' NEQ '0' (
 
 @Echo Off
 color 2e
-Title  CMD Plug
+Title  CMD Tools
 
 :begin
 cls
