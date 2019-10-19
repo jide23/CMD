@@ -1,3 +1,7 @@
+rem @Author: jide23
+===========================================================================================
+:: Elevate permissions 
+===========================================================================================
 
 @echo off  
 >nul 2>&1 "%SYSTEMROOT%\system32\cacls.exe" "%SYSTEMROOT%\system32\config\system" 
@@ -16,26 +20,36 @@ if '%errorlevel%' NEQ '0' (
     if exist "%temp%\getadmin.vbs" ( del "%temp%\getadmin.vbs" )  
     pushd "%CD%" 
     CD /D "%~dp0" 
- 
-:begin
 
+===========================================================================================
+:: The color attribute is specified by two hexadecimal digits 
+  :: - the first Corresponding to the background, the second corresponds to the foreground.
+  :: 0 = 黑色       8 = 灰色
+  :: 1 = 蓝色       9 = 淡蓝色
+  :: 2 = 绿色       A = 淡绿色
+  :: 3 = 浅绿色     B = 淡浅绿色
+  :: 4 = 红色       C = 淡红色
+  :: 5 = 紫色       D = 淡紫色
+  :: 6 = 黄色       E = 淡黄色
+  :: 7 = 白色       F = 亮白色
+===========================================================================================
 
 @Echo Off
 color 2e
-Title  CMD
+Title  CMD Plug
 
 :begin
 cls
-Echo选择以下功能使用：
-echo     【1】电脑重命名
-echo     【2】获取系统信息
-echo     【3】创建新用户
-echo     【4】删除老用户
-echo     【5】通过IP获取其用户名
-echo     【6】映射
-echo     【7】注册表
-echo     【Q】退出
-Set /P Choice= 【输入命令】
+Echo Select the following features to use:
+echo     [1]  Computer rename
+echo     [2]  Get system information
+echo     [3]  Create a new user
+echo     [4]  Delete old users
+echo     [5]  Get their username by IP
+echo     [6]  Mapping
+echo     [7]  Registry/Regedit
+echo     [Q]  Quit
+Set /P Choice= [Input the command]  
 If not "%Choice%"=="" (
   If "%Choice%"=="1" goto rename
   If "%Choice%"=="2" goto systeminfo
@@ -44,26 +58,26 @@ If not "%Choice%"=="" (
   if "%Choice%"=="5" goto ipuser
   if "%Choice%"=="6" goto mapping
   if "%Choice%"=="7" goto regedit
-  If "%Choice%"=="Q" goto quit
-  If "%Choice%"=="q" goto quit
+  If "%Choice%"==("Q" or "q") goto quit
 )
 else(
   goto begin
 )
+
 :rename
 set Name=%COMPUTERNAME%
 :GetHostName
-set /p Name=请输入新的机器名:
+set /p Name=Please enter a new machine name: 
 if %Name%==%COMPUTERNAME% goto GetHostName
 reg add "HKLM\system\CurrentControlSet\services\tcpip\parameters" /v "NV Hostname" /d %Name% /f
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName" /v ComputerName /d %Name% /f
-echo 机器名已修改，重启后生效！
-set /p Res=是否重启机器[y/n]:
+echo The machine name has been modified and will take effect after restart!
+set /p Res=Whether to restart the machine[y/n]: 
 if /i %Res% ==y (
 	shutdown -r -t 0
 )
 else(
-	echo 请稍后重启，修改后的机器名才会生效！
+	echo Please restart later, the modified machine name will take effect.
 )
 pause>nul
 goto begin
@@ -72,97 +86,105 @@ goto begin
 :systeminfo
 md systeminfo
 systeminfo  >> systeminfo\%computername%.txt
-echo 输出系统信息到 systeminfo 文件夹
+echo Output system information to systeminfo folder
 pause>nul
 goto begin
 
 
 :adduser
 net user
-set /p Choose=是否创建隐藏账户[y/n]:
+set /p Choose=Whether to created hidden accounts[y/n]: 
 if /i "%Choose%"=="y" (
-	goto hide
+	goto addhide
 )
 else(
-	goto show
+	goto addshow
 )
-:hide
-set /p User=请输入用户名:
-set /p Password=请输入用户名密码：
+:addhide
+set /p User=Please enter user username: 
+set /p Password=Please enter your user password: 
 net user %User%$ %Password% /add
 net localgroup administrators %User%$ /add
-echo 隐藏用户创建成功！
-"HKEY_LOCAL_MACHINE\SAM\SAM" [1 17] 
-"HKEY_LOCAL_MACHINE\SAM\SAM\Domains" [1 17]
+echo Hidden user created successfully!
+set route=HKEY_LOCAL_MACHINE\SAM\SAM
+:fix
+del %tmp%\ko.txt /q
+echo "%route%"[1 17]  >>%tmp%\ko.txt
+regini %tmp%\ko.txt
+set route=HKEY_LOCAL_MACHINE\SAM\SAM\Domains
+:fix
+del %tmp%\ko.txt /q
+echo "%route%"[1 17]  >>%tmp%\ko.txt
+regini %tmp%\ko.txt
 md reg
 reg export "HKEY_LOCAL_MACHINE\SAM\SAM\Domains\Account\Users\Names\%User%$" reg\BA_%User%$.reg
 reg export "HKEY_LOCAL_MACHINE\SAM\SAM\Domains\Account\Users\000003EA" reg\BB_.reg
 reg export "HKEY_LOCAL_MACHINE\SAM\SAM\Domains\Account\Users\000001F4" reg\AA_1F4.reg
-regedit
-set /p Res=BB_修改是否成功[y/n]:
+start "" regedit
+set /p Res=BB_Whether the modification is completed[y/n]: 
 if /i %Res% ==y	(
-  net user %User%$ /del
+	net user %User%$ /del
 	reg import reg\BA_%User%$.reg
 	reg import reg\BB_.reg
 	net user %User%$
+  rmdir /s/q 222 reg
 )
 else(
   rmdir /s/q 222 reg
 )
-rmdir /s/q 222 reg
 pause>nul
 goto begin
-:show
-set /p User=请输入用户名:
-set /p Password=请输入用户名密码：
+:addshow
+set /p User=Please enter user username: 
+set /p Password=Please enter your user password: 
 net user %User% %Password% /add
 net localgroup administrators %User% /add
-echo 新用户创建成功！
+echo New user created successfully!
 pause>nul
 goto begin
 
 
 :deluser
 net user
-set /p Choose=是否删除隐藏账户[y/n]:
+set /p Choose=Whether to delete hidden accounts[y/n]: 
 if /i "%Choose%"=="y" (
-	goto hide
+	goto delhide
 )
 else(
-	goto show
+	goto delshow
 )
-:hide
-set /p User=请输入用户名:
+:delhide
+set /p User=Please enter user name: 
 net user %User%$ %Password% /del
-echo 隐藏用户删除成功！
+echo Hidden user deleted successfully!
 pause>nul
 goto begin
-:show
-set /p User=请输入用户名:
+:delshow
+set /p User=Please enter user name: 
 net user %User% /del
-echo 老用户删除成功！
+echo Old user deleted successfully!
 pause>nul
 goto begin
 
 
 :ipuser
-set /p Ip=请输入IP:
+set /p Ip=Please enter the IP: 
 nbtstat -A %Ip%
 pause>nul
 goto begin
 
 
 :mapping
-set /p Ip=请输入IP查看共享网络:
+set /p Ip=Please enter IP to view the shared network: 
 net view \\%Ip%
-set /p Mlocal=请输入本地盘符:
+set /p Mlocal=Please enter the local drive letter: 
 net use %Mlocal% \\%Ip%
 pause>nul
 goto begin
 
 
 :regedit
-regedit
+start "" regedit
 pause>nul
 goto begin
 
